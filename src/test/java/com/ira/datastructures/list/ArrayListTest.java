@@ -261,6 +261,7 @@ class ArrayListTest {
 
         iterator.remove();
 
+        assertThat(arrayList.contains(SECOND_ELEMENT)).isFalse();
         assertThat(arrayList.size()).isEqualTo(2);
     }
 }
