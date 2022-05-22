@@ -1,37 +1,35 @@
 package com.ira.datastructures.list;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-public class LinkedList<T> implements List<T> {
+public class LinkedList<E> implements List<E> {
 
     private Node firstNode;
     private Node lastNode;
     private int size = 0;
 
     @Override
-    public void add(T t) {
-        var newNode = new Node(t);
-
-        if (firstNode == null) {
-            firstNode = lastNode = newNode;
-        } else {
-            lastNode.nextElement = newNode;
-            newNode.previousElement = lastNode;
-            lastNode = newNode;
-        }
-        size++;
+    public void add(E element) {
+        add(element, size);
     }
 
     @Override
-    public void add(T t, int index) {
+    public void add(E element, int index) {
         checkIndex(index, true);
-        var newNode = new Node(t);
-        if (index == 0) {
-            firstNode.previousElement = firstNode = newNode;
+        var newNode = new Node(element);
+        if (size == 0) {
+            firstNode = lastNode = newNode;
         } else if (index == size) {
             lastNode.nextElement = newNode;
+            newNode.previousElement = lastNode;
+            lastNode = newNode;
+        } else if (index == 0) {
+            firstNode.previousElement = newNode;
+            newNode.nextElement = firstNode;
+            firstNode = newNode;
         } else {
             var previousElement = findElementByIndex(index - 1);
             newNode.previousElement = previousElement;
@@ -53,12 +51,14 @@ public class LinkedList<T> implements List<T> {
         } else if (index == size) {
             elementToRemove = lastNode;
             lastNode = lastNode.previousElement;
+        } else if (size == 1) {
+            elementToRemove = firstNode;
+            firstNode = lastNode = null;
         } else {
             elementToRemove = findElementByIndex(index);
             elementToRemove.previousElement.nextElement = elementToRemove.nextElement;
             elementToRemove.nextElement.previousElement = elementToRemove.previousElement;
         }
-
         size--;
         return elementToRemove.data;
     }
@@ -70,15 +70,15 @@ public class LinkedList<T> implements List<T> {
     }
 
     @Override
-    public Object set(T t, int index) {
+    public Object set(E element, int index) {
         checkIndex(index, false);
-        var newNode = new Node(t);
+        var newNode = new Node(element);
         var nodeAtIndex = findElementByIndex(index);
         nodeAtIndex.previousElement.nextElement = newNode;
         nodeAtIndex.nextElement.previousElement = newNode;
         newNode.previousElement = nodeAtIndex.previousElement;
         newNode.nextElement = nodeAtIndex.nextElement;
-        return t;
+        return element;
     }
 
     @Override
@@ -98,15 +98,15 @@ public class LinkedList<T> implements List<T> {
     }
 
     @Override
-    public boolean contains(T t) {
-        return lastIndexOf(t) != -1;
+    public boolean contains(E element) {
+        return lastIndexOf(element) != -1;
     }
 
     @Override
-    public int indexOf(T t) {
+    public int indexOf(E element) {
         var currentElement = firstNode;
         for (int i = 0; i < size; i++) {
-            if (Objects.equals(currentElement.data, t)) {
+            if (Objects.equals(currentElement.data, element)) {
                 return i;
             }
             currentElement = currentElement.nextElement;
@@ -115,11 +115,11 @@ public class LinkedList<T> implements List<T> {
     }
 
     @Override
-    public int lastIndexOf(T t) {
+    public int lastIndexOf(E element) {
         var currentElement = lastNode;
 
         for (int i = size - 1; i > -1; i--) {
-            if (Objects.equals(currentElement.data, t)) {
+            if (Objects.equals(currentElement.data, element)) {
                 return i;
             }
             currentElement = currentElement.previousElement;
@@ -153,8 +153,8 @@ public class LinkedList<T> implements List<T> {
     }
 
     @Override
-    public Iterator<T> iterator() {
-        return new Iterator<T>() {
+    public Iterator<E> iterator() {
+        return new Iterator<E>() {
 
             private Node currentElement = firstNode;
 
@@ -164,25 +164,28 @@ public class LinkedList<T> implements List<T> {
             }
 
             @Override
-            public T next() {
-                var result = currentElement.data;
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                E result = (E) currentElement.data;
                 currentElement = currentElement.nextElement;
-                return (T) result;
+                return result;
             }
 
             @Override
             public void remove() {
-                LinkedList.this.remove(indexOf((T) currentElement.data));
+                LinkedList.this.remove(indexOf((E) currentElement.data));
             }
         };
     }
 
-    class Node {
+    static class Node {
         private Node nextElement;
         private Node previousElement;
         private Object data;
 
-        public Node(Object data) {
+        private Node(Object data) {
             this.data = data;
         }
     }

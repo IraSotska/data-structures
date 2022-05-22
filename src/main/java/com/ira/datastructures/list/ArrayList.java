@@ -1,10 +1,11 @@
 package com.ira.datastructures.list;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-public class ArrayList<T> implements List<T> {
+public class ArrayList<E> implements List<E> {
 
     private static final int DEFAULT_ARRAY_SIZE = 5;
     private int arraySize;
@@ -21,16 +22,16 @@ public class ArrayList<T> implements List<T> {
     }
 
     @Override
-    public void add(Object o) {
-        add(o, currentIndex);
+    public void add(E element) {
+        add(element, currentIndex);
     }
 
     @Override
-    public void add(Object o, int index) {
+    public void add(E element, int index) {
         checkIndex(index, true);
         checkSize();
         System.arraycopy(array, index, array, index + 1, 1);
-        array[index] = o;
+        array[index] = element;
 
         currentIndex++;
     }
@@ -40,6 +41,7 @@ public class ArrayList<T> implements List<T> {
         checkIndex(index, false);
         var elementForRemove = array[index];
         System.arraycopy(array, index + 1, array, index, currentIndex - index);
+        array[currentIndex] = null;
         currentIndex--;
         return elementForRemove;
     }
@@ -51,9 +53,9 @@ public class ArrayList<T> implements List<T> {
     }
 
     @Override
-    public Object set(Object o, int index) {
+    public Object set(E element, int index) {
         checkIndex(index, false);
-        array[index] = o;
+        array[index] = element;
         return array[index];
     }
 
@@ -84,14 +86,14 @@ public class ArrayList<T> implements List<T> {
     }
 
     @Override
-    public boolean contains(Object o) {
-        return lastIndexOf(o) != -1;
+    public boolean contains(E element) {
+        return lastIndexOf(element) != -1;
     }
 
     @Override
-    public int indexOf(Object o) {
+    public int indexOf(E element) {
         for (int i = 0; i < currentIndex; i++) {
-            if(Objects.equals(array[i], o)) {
+            if(Objects.equals(array[i], element)) {
                 return i;
             }
         }
@@ -99,9 +101,9 @@ public class ArrayList<T> implements List<T> {
     }
 
     @Override
-    public int lastIndexOf(Object o) {
+    public int lastIndexOf(E element) {
         for (int i = currentIndex - 1; i > -1; i--) {
-            if(Objects.equals(array[i], o)) {
+            if(Objects.equals(array[i], element)) {
                 return i;
             }
         }
@@ -124,8 +126,8 @@ public class ArrayList<T> implements List<T> {
     }
 
     @Override
-    public Iterator<T> iterator() {
-        return new Iterator<T>() {
+    public Iterator<E> iterator() {
+        return new Iterator<E>() {
             private int currentIteratorIndex = 0;
 
             @Override
@@ -134,10 +136,13 @@ public class ArrayList<T> implements List<T> {
             }
 
             @Override
-            public T next() {
-                var nextElement = get(currentIteratorIndex);
+            public E next() {
+                if(!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                E nextElement = (E) get(currentIteratorIndex);
                 currentIteratorIndex++;
-                return (T) nextElement;
+                return nextElement;
             }
 
             @Override
