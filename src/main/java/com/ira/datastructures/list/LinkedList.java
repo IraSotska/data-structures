@@ -7,8 +7,8 @@ import java.util.StringJoiner;
 
 public class LinkedList<E> implements List<E> {
 
-    private Node firstNode;
-    private Node lastNode;
+    private Node<E> firstNode;
+    private Node<E> lastNode;
     private int size = 0;
 
     @Override
@@ -19,7 +19,7 @@ public class LinkedList<E> implements List<E> {
     @Override
     public void add(E element, int index) {
         checkIndex(index, true);
-        var newNode = new Node(element);
+        var newNode = new Node<>(element);
         if (size == 0) {
             firstNode = lastNode = newNode;
         } else if (index == size) {
@@ -41,9 +41,9 @@ public class LinkedList<E> implements List<E> {
     }
 
     @Override
-    public Object remove(int index) {
+    public E remove(int index) {
         checkIndex(index, false);
-        Node elementToRemove;
+        Node<E> elementToRemove;
 
         if (index == 0) {
             elementToRemove = firstNode;
@@ -72,7 +72,7 @@ public class LinkedList<E> implements List<E> {
     @Override
     public Object set(E element, int index) {
         checkIndex(index, false);
-        var newNode = new Node(element);
+        var newNode = new Node<>(element);
         var nodeAtIndex = findElementByIndex(index);
         nodeAtIndex.previousElement.nextElement = newNode;
         nodeAtIndex.nextElement.previousElement = newNode;
@@ -138,8 +138,8 @@ public class LinkedList<E> implements List<E> {
     }
 
 
-    private Node findElementByIndex(int index) {
-        var currentNode = firstNode;
+    private Node<E> findElementByIndex(int index) {
+        Node<E> currentNode = firstNode;
         for (int i = 0; i < index; i++) {
             currentNode = currentNode.nextElement;
         }
@@ -154,9 +154,9 @@ public class LinkedList<E> implements List<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return new Iterator<E>() {
+        return new Iterator<>() {
 
-            private Node currentElement = firstNode;
+            private Node<E> currentElement = firstNode;
 
             @Override
             public boolean hasNext() {
@@ -168,24 +168,24 @@ public class LinkedList<E> implements List<E> {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                E result = (E) currentElement.data;
+                E result = currentElement.data;
                 currentElement = currentElement.nextElement;
                 return result;
             }
 
             @Override
             public void remove() {
-                LinkedList.this.remove(indexOf((E) currentElement.data));
+                LinkedList.this.remove(indexOf(currentElement.data));
             }
         };
     }
 
-    static class Node {
-        private Node nextElement;
-        private Node previousElement;
-        private Object data;
+    static class Node<E> {
+        private Node<E> nextElement;
+        private Node<E> previousElement;
+        private E data;
 
-        private Node(Object data) {
+        private Node(E data) {
             this.data = data;
         }
     }
