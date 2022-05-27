@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class HashMapTest {
-
     private final HashMap<String, String> hashMap = new HashMap<>();
     private static final String FIRST_VALUE = "val";
     private static final String SECOND_VALUE = "val2";
@@ -23,6 +22,17 @@ class HashMapTest {
         assertThat(hashMap.put(FIRST_KEY, SECOND_VALUE)).isEqualTo(FIRST_VALUE);
         assertThat(hashMap.size()).isEqualTo(1);
         assertThat(hashMap.get(FIRST_KEY)).isEqualTo(SECOND_VALUE);
+    }
+
+    @DisplayName("Should Increase Number Of Buckets")
+    @Test
+    void shouldIncreaseNumberOfBuckets() {
+        assertThat(hashMap.put(FIRST_KEY, FIRST_VALUE)).isEqualTo(null);
+        assertThat(hashMap.put(SECOND_KEY, SECOND_VALUE)).isEqualTo(null);
+        assertThat(hashMap.put(FIRST_VALUE, FIRST_VALUE)).isEqualTo(null);
+        assertThat(hashMap.put(SECOND_VALUE, SECOND_VALUE)).isEqualTo(null);
+        assertThat(hashMap.put(null, SECOND_VALUE)).isEqualTo(null);
+        assertThat(hashMap.size()).isEqualTo(5);
     }
 
     @DisplayName("Should Return Element By Key")
@@ -86,9 +96,13 @@ class HashMapTest {
         hashMap.put(SECOND_KEY, SECOND_VALUE);
         var iterator = hashMap.iterator();
         assertThat(iterator.hasNext()).isTrue();
-        assertThat(iterator.next()).isEqualTo(FIRST_VALUE);
+        var nextElement = iterator.next();
+        assertThat(nextElement.getKey()).isEqualTo(FIRST_KEY);
+        assertThat(nextElement.getValue()).isEqualTo(FIRST_VALUE);
         assertThat(iterator.hasNext()).isTrue();
-        assertThat(iterator.next()).isEqualTo(SECOND_VALUE);
+        nextElement = iterator.next();
+        assertThat(nextElement.getKey()).isEqualTo(SECOND_KEY);
+        assertThat(nextElement.getValue()).isEqualTo(SECOND_VALUE);
         assertThat(iterator.hasNext()).isFalse();
     }
 
@@ -99,7 +113,9 @@ class HashMapTest {
         hashMap.put(SECOND_KEY, SECOND_VALUE);
         var iterator = hashMap.iterator();
         assertThat(iterator.hasNext()).isTrue();
-        assertThat(iterator.next()).isEqualTo(FIRST_VALUE);
+        var nextElement = iterator.next();
+        assertThat(nextElement.getKey()).isEqualTo(FIRST_KEY);
+        assertThat(nextElement.getValue()).isEqualTo(FIRST_VALUE);
         iterator.remove();
         assertThat(hashMap.containsKey(FIRST_KEY)).isFalse();
         assertThat(hashMap.containsKey(SECOND_KEY)).isTrue();
@@ -113,9 +129,13 @@ class HashMapTest {
         hashMap.put(SECOND_KEY, SECOND_VALUE);
         var iterator = hashMap.iterator();
         assertThat(iterator.hasNext()).isTrue();
-        assertThat(iterator.next()).isEqualTo(FIRST_VALUE);
+        var nextElement = iterator.next();
+        assertThat(nextElement.getKey()).isEqualTo(FIRST_KEY);
+        assertThat(nextElement.getValue()).isEqualTo(FIRST_VALUE);
         assertThat(iterator.hasNext()).isTrue();
-        assertThat(iterator.next()).isEqualTo(SECOND_VALUE);
+        nextElement = iterator.next();
+        assertThat(nextElement.getKey()).isEqualTo(SECOND_KEY);
+        assertThat(nextElement.getValue()).isEqualTo(SECOND_VALUE);
         assertThat(iterator.hasNext()).isFalse();
         assertThatThrownBy(iterator::next).isInstanceOf(NoSuchElementException.class);
     }
