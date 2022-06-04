@@ -1,2 +1,4 @@
 # data-structures
-## Array list, Linked List, Hash map implementation
+* Array list
+* Linked List
+* Hash Map
