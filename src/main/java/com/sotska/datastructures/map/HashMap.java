@@ -1,4 +1,4 @@
-package com.ira.datastructures.map;
+package com.sotska.datastructures.map;
 
 import java.util.*;
 
@@ -75,18 +75,23 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     private List<Entry<K, V>> getBucket(K key, List<Entry<K, V>>[] buckets) {
-        int bucketNumber;
+        int bucketIndex;
         if (key == null) {
-            bucketNumber = 0;
+            bucketIndex = 0;
         } else {
             var hash = key.hashCode();
-            bucketNumber = Math.abs(hash) < 0 ? Math.abs(hash - 1) : Math.abs(hash) % buckets.length;
+            if(hash == Integer.MIN_VALUE) {
+                bucketIndex = 0;
+            }
+            else {
+                bucketIndex = Math.abs(hash) % buckets.length;
+            }
         }
 
-        if (buckets[bucketNumber] == null) {
-            buckets[bucketNumber] = new ArrayList<>(10);
+        if (buckets[bucketIndex] == null) {
+            buckets[bucketIndex] = new ArrayList<>(1);
         }
-        return buckets[bucketNumber];
+        return buckets[bucketIndex];
     }
 
     private void checkOccupancy() {
@@ -107,7 +112,7 @@ public class HashMap<K, V> implements Map<K, V> {
     @Override
     public Iterator<Entry<K, V>> iterator() {
         return new Iterator<>() {
-            private int bucketIndex = 0;
+            private int bucketIndex;
             private Iterator<Entry<K, V>> bucketIterator = getNextBucketIterator();
 
             @Override
@@ -147,7 +152,7 @@ public class HashMap<K, V> implements Map<K, V> {
         };
     }
 
-    public static class Entry<K, V> {
+    protected static class Entry<K, V> {
         private final K key;
         private V value;
 

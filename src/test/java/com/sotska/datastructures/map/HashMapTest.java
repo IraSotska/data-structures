@@ -1,4 +1,4 @@
-package com.ira.datastructures.map;
+package com.sotska.datastructures.map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

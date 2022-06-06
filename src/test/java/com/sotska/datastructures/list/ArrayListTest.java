@@ -1,4 +1,4 @@
-package com.ira.datastructures.list;
+package com.sotska.datastructures.list;
 
 class ArrayListTest extends AbstractListTest {
 
