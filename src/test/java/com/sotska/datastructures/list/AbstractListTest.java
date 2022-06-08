@@ -250,7 +250,11 @@ public abstract class AbstractListTest {
         list.add("three");
 
         assertThat(list.toString()).isEqualTo("[one, two, three]");
-        list.clear();
+    }
+
+    @DisplayName("Should Return String Of Empty List Of Elements")
+    @Test
+    void shouldReturnStringOfEmptyListOfElements() {
         assertThat(list.toString()).isEqualTo("[]");
     }
 
@@ -292,7 +296,7 @@ public abstract class AbstractListTest {
 
         iterator.remove();
 
-        assertThat(list.contains("two")).isFalse();
+        assertThat(list.contains("one")).isFalse();
         assertThat(list.size()).isEqualTo(2);
     }
 
@@ -306,5 +310,26 @@ public abstract class AbstractListTest {
         assertThat(iterator.next()).isEqualTo("one");
         assertThat(iterator.hasNext()).isFalse();
         assertThatThrownBy(iterator::next).isExactlyInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("Should Throw Exception While Iterate If No Such Element")
+    @Test
+    void shouldThrowExceptionWhileIterateIfRemoveWithoutCallNextMethod() {
+        list.add("one");
+
+        var iterator = list.iterator();
+        assertThatThrownBy(iterator::remove).isExactlyInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("Should Throw Exception While Iterate If No Such Element")
+    @Test
+    void shouldThrowExceptionWhileIterateIfRemoveAlreadyCalledOnThisElement() {
+
+        list.add("one");
+
+        var iterator = list.iterator();
+        iterator.next();
+        iterator.remove();
+        assertThatThrownBy(iterator::remove).isExactlyInstanceOf(IllegalStateException.class);
     }
 }

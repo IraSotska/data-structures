@@ -1,6 +1,5 @@
 package com.sotska.datastructures.list;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -127,11 +126,14 @@ public class LinkedList<T> implements List<T> {
     @Override
     public String toString() {
         var stringJoiner = new StringJoiner(", ", "[", "]");
+        this.forEach(element -> stringJoiner.add(String.valueOf(element)));
 
-        for (int i = 0; i < size; i++) {
-            stringJoiner.add(String.valueOf(get(i)));
-        }
         return stringJoiner.toString();
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<>();
     }
 
     private Node<T> getNode(int index) {
@@ -162,32 +164,40 @@ public class LinkedList<T> implements List<T> {
         }
     }
 
-    @Override
-    public Iterator<T> iterator() {
-        return new Iterator<>() {
+    class Iterator<E> implements java.util.Iterator<T> {
+        private Node<T> currentElement;
+        private boolean isCurrentElementCanBeRemoved;
 
-            private Node<T> currentElement = firstNode;
-
-            @Override
-            public boolean hasNext() {
-                return currentElement != null;
+        @Override
+        public boolean hasNext() {
+            if (currentElement != null) {
+                return currentElement.nextNode != null;
             }
+            return size != 0;
+        }
 
-            @Override
-            public T next() {
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                }
-                T result = currentElement.value;
+        @Override
+        public T next() {
+            if (currentElement == null) {
+                currentElement = firstNode;
+            } else if (currentElement.nextNode == null) {
+                throw new NoSuchElementException();
+            } else {
                 currentElement = currentElement.nextNode;
-                return result;
             }
+            isCurrentElementCanBeRemoved = true;
+            return currentElement.value;
+        }
 
-            @Override
-            public void remove() {
+        @Override
+        public void remove() {
+            if (isCurrentElementCanBeRemoved) {
                 LinkedList.this.remove(indexOf(currentElement.value));
+                isCurrentElementCanBeRemoved = false;
+            } else {
+                throw new IllegalStateException();
             }
-        };
+        }
     }
 
     private static class Node<T> {

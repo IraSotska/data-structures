@@ -1,6 +1,9 @@
 package com.sotska.datastructures.list;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 public class ArrayList<T> implements List<T> {
 
@@ -18,6 +21,7 @@ public class ArrayList<T> implements List<T> {
         this(capacity, DEFAULT_LOAD_FACTOR);
     }
 
+    @SuppressWarnings("unchecked")
     public ArrayList(int capacity, double loadFactor) {
         this.loadFactor = loadFactor;
         array = (T[]) new Object[capacity];
@@ -80,10 +84,7 @@ public class ArrayList<T> implements List<T> {
     @Override
     public String toString() {
         var stringJoiner = new StringJoiner(", ", "[", "]");
-
-        for (int i = 0; i < size; i++) {
-            stringJoiner.add(String.valueOf(array[i]));
-        }
+        this.forEach(element -> stringJoiner.add(String.valueOf(element)));
 
         return stringJoiner.toString();
     }
@@ -113,6 +114,11 @@ public class ArrayList<T> implements List<T> {
         return -1;
     }
 
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<>();
+    }
+
     private void validateIndex(int index) {
         if (index < 0 || index > size - 1) {
             throw new IndexOutOfBoundsException("Index should be between 0 and " + size + " Current index is " + index);
@@ -125,6 +131,7 @@ public class ArrayList<T> implements List<T> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void ensureCapacity() {
         if (size == array.length - 1) {
             T[] newArray = (T[]) new Object[(int) (array.length * loadFactor)];
@@ -133,30 +140,34 @@ public class ArrayList<T> implements List<T> {
         }
     }
 
-    @Override
-    public Iterator<T> iterator() {
-        return new Iterator<>() {
-            private int currentIteratorIndex = 0;
+    class Iterator<E> implements java.util.Iterator<T> {
+        private int currentIteratorIndex = 0;
+        private boolean isCurrentElementCanBeRemoved;
 
-            @Override
-            public boolean hasNext() {
-                return currentIteratorIndex < size;
-            }
+        @Override
+        public boolean hasNext() {
+            return currentIteratorIndex < size;
+        }
 
-            @Override
-            public T next() {
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                }
-                T nextElement = get(currentIteratorIndex);
-                currentIteratorIndex++;
-                return nextElement;
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
             }
+            T nextElement = get(currentIteratorIndex);
+            currentIteratorIndex++;
+            isCurrentElementCanBeRemoved = true;
+            return nextElement;
+        }
 
-            @Override
-            public void remove() {
-                ArrayList.this.remove(currentIteratorIndex);
+        @Override
+        public void remove() {
+            if (isCurrentElementCanBeRemoved) {
+                ArrayList.this.remove(currentIteratorIndex - 1);
+                isCurrentElementCanBeRemoved = false;
+            } else {
+                throw new IllegalStateException();
             }
-        };
+        }
     }
 }
