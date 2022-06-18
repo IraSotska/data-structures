@@ -11,19 +11,9 @@ public interface Map<K, V> extends Iterable<Map.Entry<K, V>> {
 
     int size();
 
-    interface Entry<K, V> extends Iterable<Map.Entry<K, V>> {
+    interface Entry<K, V> {
         K getKey();
 
         V getValue();
-
-        void setValue(V value);
-
-        void setHash(int hash);
-
-        int getHash();
-
-        Entry<K, V> getNext();
-
-        void setNext(Entry<K, V> next);
     }
 }

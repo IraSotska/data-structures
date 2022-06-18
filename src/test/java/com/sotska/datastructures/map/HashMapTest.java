@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 
 class HashMapTest {
     private final HashMap<String, String> hashMap = new HashMap<>();
@@ -15,75 +14,76 @@ class HashMapTest {
     @DisplayName("Should Put Element To Map")
     @Test
     void shouldPutElementToMap() {
-        assertThat(hashMap.put("key", "val")).isEqualTo(null);
-        assertThat(hashMap.put("key", "val2")).isEqualTo("val");
-        assertThat(hashMap.size()).isEqualTo(1);
-        assertThat(hashMap.get("key")).isEqualTo("val2");
+        assertNull(hashMap.put("key", "val"));
+        assertEquals(hashMap.put("key", "val2"), "val");
+        assertEquals(hashMap.size(), 1);
+        assertEquals(hashMap.get("key"), "val2");
     }
 
     @DisplayName("Should Increase Number Of Buckets")
     @Test
     void shouldIncreaseNumberOfBuckets() {
-        assertThat(hashMap.put("key", "val")).isEqualTo(null);
-        assertThat(hashMap.put("key2", "val2")).isEqualTo(null);
-        assertThat(hashMap.put("val", "val")).isEqualTo(null);
-        assertThat(hashMap.put("val2", "val2")).isEqualTo(null);
-        assertThat(hashMap.put(null, "val2")).isEqualTo(null);
-        assertThat(hashMap.size()).isEqualTo(5);
+        assertNull(hashMap.put("key", "val"));
+        assertNull(hashMap.put("key2", "val2"));
+        assertNull(hashMap.put("val", "val"));
+        assertNull(hashMap.put("val2", "val2"));
+        assertNull(hashMap.put(null, "val2"));
+        assertEquals(hashMap.size(), 5);
     }
 
     @DisplayName("Should Return Element By Key")
     @Test
     void shouldReturnElementByKey() {
         hashMap.put("key", "val");
-        assertThat(hashMap.get("key")).isEqualTo("val");
+        assertEquals(hashMap.get("key"), "val");
     }
 
     @DisplayName("Should Return Null If Get Element That Not Exist")
     @Test
     void shouldReturnNullIfGetElementThatNotExist() {
         hashMap.put("key", "val");
-        assertThat(hashMap.get("key2")).isEqualTo(null);
+        assertNull(hashMap.get("key2"));
     }
 
     @DisplayName("Should Return True If Contains Key")
     @Test
     void shouldReturnTrueIfContainsKey() {
         hashMap.put("key", "val");
-        assertThat(hashMap.containsKey("key")).isTrue();
+        assertTrue(hashMap.containsKey("key"));
     }
 
     @DisplayName("Should Return False If Not Contains Key")
     @Test
     void shouldReturnFalseIfNotContainsKey() {
         hashMap.put("key", "val");
-        assertThat(hashMap.containsKey("key2")).isFalse();
+        assertFalse(hashMap.containsKey("key2"));
     }
 
     @DisplayName("Should Remove Element")
     @Test
     void shouldRemoveElement() {
         hashMap.put("key", "val");
-        assertThat(hashMap.remove("key")).isEqualTo("val");
+        assertEquals(hashMap.remove("key"), "val");
+        assertFalse(hashMap.containsKey("key"));
     }
 
     @DisplayName("Should Return Null If Remove Element That Not Exist")
     @Test
     void shouldReturnNullIfRemoveElementThatNotExist() {
-        assertThat(hashMap.remove("key")).isEqualTo(null);
+        assertNull(hashMap.remove("key"));
     }
 
     @DisplayName("Should Return Size Of Map")
     @Test
     void shouldReturnSizeOfMap() {
         hashMap.put("key", "val");
-        assertThat(hashMap.size()).isEqualTo(1);
+        assertEquals(hashMap.size(), 1);
     }
 
     @DisplayName("Should Return Size Of Empty Map")
     @Test
     void shouldReturnSizeOfEmptyMap() {
-        assertThat(hashMap.size()).isEqualTo(0);
+        assertEquals(hashMap.size(), 0);
     }
 
     @DisplayName("Should Iterate Through Map")
@@ -96,14 +96,14 @@ class HashMapTest {
         hashMap.put("key2", "val2");
         var iterator = hashMap.iterator();
 
-        assertThat(iterator.hasNext()).isTrue();
+        assertTrue(iterator.hasNext());
         var firstElement = iterator.next();
-        assertThat(iterator.hasNext()).isTrue();
+        assertTrue(iterator.hasNext());
         var secondElement = iterator.next();
-        assertThat(iterator.hasNext()).isFalse();
+        assertFalse(iterator.hasNext());
 
-        assertThat(Set.of(firstElement.getKey(), secondElement.getKey())).isEqualTo(expectedKeys);
-        assertThat(Set.of(firstElement.getValue(), secondElement.getValue())).isEqualTo(expectedValues);
+        assertEquals(Set.of(firstElement.getKey(), secondElement.getKey()), expectedKeys);
+        assertEquals(Set.of(firstElement.getValue(), secondElement.getValue()), expectedValues);
     }
 
     @DisplayName("Should Remove Element While Iterate Through Map")
@@ -111,14 +111,14 @@ class HashMapTest {
     void shouldRemoveElementWhileIterateThroughMap() {
         hashMap.put("key2", "val2");
         var iterator = hashMap.iterator();
-        assertThat(iterator.hasNext()).isTrue();
+        assertTrue(iterator.hasNext());
 
         var nextElement = iterator.next();
-        assertThat(nextElement.getKey()).isEqualTo("key2");
-        assertThat(nextElement.getValue()).isEqualTo("val2");
+        assertEquals(nextElement.getKey(), "key2");
+        assertEquals(nextElement.getValue(), "val2");
         iterator.remove();
-        assertThat(hashMap.containsKey("key2")).isFalse();
-        assertThat(hashMap.size()).isEqualTo(0);
+        assertFalse(hashMap.containsKey("key2"));
+        assertEquals(hashMap.size(), 0);
     }
 
     @DisplayName("Should Throw Exception If No Such Elements")
@@ -131,13 +131,24 @@ class HashMapTest {
         hashMap.put("key2", "val2");
 
         var iterator = hashMap.iterator();
-        assertThat(iterator.hasNext()).isTrue();
+        assertTrue(iterator.hasNext());
         var firstElement = iterator.next();
-        assertThat(iterator.hasNext()).isTrue();
+        assertTrue(iterator.hasNext());
         var secondElement = iterator.next();
-        assertThat(iterator.hasNext()).isFalse();
-        assertThat(Set.of(firstElement.getKey(), secondElement.getKey())).isEqualTo(expectedKeys);
-        assertThat(Set.of(firstElement.getValue(), secondElement.getValue())).isEqualTo(expectedValues);
-        assertThatThrownBy(iterator::next).isExactlyInstanceOf(NoSuchElementException.class).hasMessage("No such element at map.");
+        assertFalse(iterator.hasNext());
+        assertEquals(Set.of(firstElement.getKey(), secondElement.getKey()), expectedKeys);
+        assertEquals(Set.of(firstElement.getValue(), secondElement.getValue()), expectedValues);
+
+        var exception = assertThrows(NoSuchElementException.class, iterator::next);
+        assertEquals(exception.getMessage(), "No such element at map.");
+    }
+
+    @DisplayName("Should Throw Exception If Remove Element In Iterator Without Call Next")
+    @Test
+    void shouldThrowExceptionIfRemoveElementInIteratorWithoutCallNext() {
+        var iterator = hashMap.iterator();
+
+        var exception = assertThrows(IllegalStateException.class, iterator::remove);
+        assertEquals(exception.getMessage(), "Have no element to remove.");
     }
 }
