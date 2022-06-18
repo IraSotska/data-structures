@@ -1,9 +1,6 @@
 package com.sotska.datastructures.list;
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class ArrayList<T> implements List<T> {
 
@@ -54,7 +51,7 @@ public class ArrayList<T> implements List<T> {
     @Override
     public T get(int index) {
         validateIndex(index);
-        return (T) array[index];
+        return array[index];
     }
 
     @Override
@@ -62,7 +59,7 @@ public class ArrayList<T> implements List<T> {
         validateIndex(index);
         var oldValue = array[index];
         array[index] = value;
-        return (T) oldValue;
+        return oldValue;
     }
 
     @Override
@@ -115,8 +112,8 @@ public class ArrayList<T> implements List<T> {
     }
 
     @Override
-    public Iterator<T> iterator() {
-        return new Iterator<>();
+    public ArrayListIterator<T> iterator() {
+        return new ArrayListIterator<>();
     }
 
     private void validateIndex(int index) {
@@ -140,7 +137,7 @@ public class ArrayList<T> implements List<T> {
         }
     }
 
-    class Iterator<E> implements java.util.Iterator<T> {
+    private class ArrayListIterator<E> implements Iterator<T> {
         private int currentIteratorIndex = 0;
         private boolean isCurrentElementCanBeRemoved;
 

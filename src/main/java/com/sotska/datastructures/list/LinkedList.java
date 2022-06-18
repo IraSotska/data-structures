@@ -42,24 +42,7 @@ public class LinkedList<T> implements List<T> {
     @Override
     public T remove(int index) {
         checkIndex(index);
-        Node<T> nodeToRemove;
-
-        if (index == 0) {
-            nodeToRemove = firstNode;
-            firstNode = firstNode.nextNode;
-        } else if (index == size) {
-            nodeToRemove = lastNode;
-            lastNode = lastNode.previousNode;
-        } else if (size == 1) {
-            nodeToRemove = firstNode;
-            firstNode = lastNode = null;
-        } else {
-            nodeToRemove = getNode(index);
-            nodeToRemove.previousNode.nextNode = nodeToRemove.nextNode;
-            nodeToRemove.nextNode.previousNode = nodeToRemove.previousNode;
-        }
-        size--;
-        return nodeToRemove.value;
+        return remove(getNode(index));
     }
 
     @Override
@@ -152,6 +135,22 @@ public class LinkedList<T> implements List<T> {
         return currentNode;
     }
 
+    private T remove(Node<T> nodeToRemove) {
+        if (nodeToRemove == firstNode) {
+            firstNode = firstNode.nextNode;
+        } else if (nodeToRemove == lastNode) {
+            lastNode = lastNode.previousNode;
+        } else if (size == 1) {
+            nodeToRemove = firstNode;
+            firstNode = lastNode = null;
+        } else {
+            nodeToRemove.previousNode.nextNode = nodeToRemove.nextNode;
+            nodeToRemove.nextNode.previousNode = nodeToRemove.previousNode;
+        }
+        size--;
+        return nodeToRemove.value;
+    }
+
     private void checkIndex(int index) {
         if (index < 0 || index > size - 1) {
             throw new IndexOutOfBoundsException("Index should be between 0 and " + size + " Current index is " + index);
@@ -165,35 +164,31 @@ public class LinkedList<T> implements List<T> {
     }
 
     class Iterator<E> implements java.util.Iterator<T> {
-        private Node<T> currentElement;
-        private boolean isCurrentElementCanBeRemoved;
+        private Node<T> currentElement = firstNode;
+        private boolean canBeRemoved;
 
         @Override
         public boolean hasNext() {
-            if (currentElement != null) {
-                return currentElement.nextNode != null;
-            }
-            return size != 0;
+            return currentElement != null;
         }
 
         @Override
         public T next() {
             if (currentElement == null) {
-                currentElement = firstNode;
-            } else if (currentElement.nextNode == null) {
                 throw new NoSuchElementException();
-            } else {
-                currentElement = currentElement.nextNode;
             }
-            isCurrentElementCanBeRemoved = true;
-            return currentElement.value;
+
+            T value = currentElement.value;
+            currentElement = currentElement.nextNode;
+            canBeRemoved = true;
+            return value;
         }
 
         @Override
         public void remove() {
-            if (isCurrentElementCanBeRemoved) {
-                LinkedList.this.remove(indexOf(currentElement.value));
-                isCurrentElementCanBeRemoved = false;
+            if (canBeRemoved) {
+                LinkedList.this.remove(currentElement);
+                canBeRemoved = false;
             } else {
                 throw new IllegalStateException();
             }
